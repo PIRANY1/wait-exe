@@ -1,0 +1,34 @@
+name: Build wait.exe
+
+on:
+  push:
+    paths:
+      - 'wait.c'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install MinGW (für Windows-Binaries unter Linux)
+      run: sudo apt-get update && sudo apt-get install -y mingw-w64
+
+    - name: Compile wait.c to wait.exe
+      run: x86_64-w64-mingw32-gcc -Os -s -o wait.exe wait.c
+
+    - name: Generate SHA256 checksum
+      run: sha256sum wait.exe > wait.exe.sha256
+
+    - name: Create bin folder
+      run: mkdir -p bin && mv wait.exe wait.exe.sha256 bin/
+
+    - name: Upload to repository
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "🔧 Build wait.exe and generate SHA256"
+        file_pattern: bin/wait.exe bin/wait.exe.sha256
