@@ -8,7 +8,13 @@ Since `cmd.exe` doesn’t support sleeping in **milliseconds**, this tool fills 
 ### 🛠️ Compile with GCC:
 
 ```cmd
-gcc -Os -s -o wait.exe wait.c
+gcc -Os -s -o wait.exe wait.c \
+    -ffunction-sections \
+    -fdata-sections \
+    -Wl,--gc-sections \
+    -fno-ident \
+    -fomit-frame-pointer \
+    -flto
 ```
 
 ### ▶️ Usage:
