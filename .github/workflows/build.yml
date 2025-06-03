@@ -19,13 +19,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y mingw-w64
 
     - name: Compile wait.c to wait.exe
-      run: x86_64-w64-mingw32-gcc -Os -s -o wait.exe wait.c \
-          -ffunction-sections \
-          -fdata-sections \
-          -Wl,--gc-sections \
-          -fno-ident \
-          -fomit-frame-pointer \
-          -flto
+      run: x86_64-w64-mingw32-gcc -Os -s -ffunction-sections -fdata-sections -Wl,--gc-sections -fno-ident -fomit-frame-pointer -flto -o wait.exe wait.c
 
 
     - name: Generate SHA256 checksum
