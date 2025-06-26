@@ -1,34 +1,104 @@
 #include <unistd.h> // For usleep() and write()
 
-// No <stdio.h> is needed as we use write() for minimal output.
+// Define file descriptors for standard output (1) and standard error (2)
+#define STDOUT 1
+#define STDERR 2
+
+// A small helper function to get the length of a string,
+// avoiding the C standard library.
+int str_len(const char *s) {
+    int i = 0;
+    while (s[i] != '\0') {
+        i++;
+    }
+    return i;
+}
+
+// A small helper function to print error messages and usage.
+void print_usage_and_exit() {
+    char *usage = "Usage: wait [-s] <value>[ms|s|m|h]\n\n"
+                  "  -s        Silent mode (no progress dots)\n"
+                  "  <value>   A non-negative integer\n"
+                  "  ms        Milliseconds\n"
+                  "  s         Seconds (default)\n"
+                  "  m         Minutes\n"
+                  "  h         Hours\n\n"
+                  "Example: wait 10s\n";
+    write(STDERR, usage, str_len(usage));
+    // Using _exit() instead of return 1 to bypass exit handlers
+    // and keep the compiled size minimal.
+    _exit(1);
+}
 
 int main(int argc, char *argv[]) {
-    // Check if any command-line argument (other than the program name) was passed.
     if (argc < 2) {
-        // Print a very short error message to stderr (file descriptor 2).
-        write(2, "Error: Missing argument.\n", 25); // A slightly more descriptive short message
-        // Or, for an extremely short message:
-        // write(2, "Arg?\n", 5);
-        return 1; // Return an error code
+        print_usage_and_exit();
     }
 
-    int input = 0;
-    // This loop converts the first command-line argument to an integer.
-    // It assumes the argument is a valid non-negative integer.
-    // No error checking for non-digit characters is present in the original logic.
-    for (int i = 0; argv[1][i] != '\0'; i++) {
-        // Check if the character is a digit before converting
-        if (argv[1][i] >= '0' && argv[1][i] <= '9') {
-            input = input * 10 + (argv[1][i] - '0');
-        } else {
-            // If a non-digit is found, print an error and exit.
-            write(2, "Error: Argument must be a number.\n", 34);
-            return 1; // Return an error code
+    int is_silent = 0;
+    char *time_arg = NULL;
+    
+    // Parse arguments: look for the optional '-s' flag.
+    if (argv[1][0] == '-' && argv[1][1] == 's' && argv[1][2] == '\0') {
+        is_silent = 1;
+        if (argc < 3) {
+            print_usage_and_exit();
         }
+        time_arg = argv[2];
+    } else {
+        time_arg = argv[1];
     }
 
-    // Sleep for 'input' multiplied by 500,000 microseconds (0.5 seconds).
-    usleep(input * 500000);
+    long long value = 0;
+    int len = 0;
+    char unit_char1 = 's'; // Default unit is seconds
+    char unit_char2 = '\0';
+
+    // Convert the argument string to a number and extract the unit.
+    for (int i = 0; time_arg[i] != '\0'; i++) {
+        if (time_arg[i] >= '0' && time_arg[i] <= '9') {
+            value = value * 10 + (time_arg[i] - '0');
+        } else {
+            // The first non-digit character is the start of the unit.
+            unit_char1 = time_arg[i];
+            if (time_arg[i+1] != '\0') { // for 'ms'
+               unit_char2 = time_arg[i+1];
+            }
+            break; // Stop parsing the number
+        }
+        len++;
+    }
+
+    if (len == 0 && value == 0) { // No number found
+        print_usage_and_exit();
+    }
+
+    // Convert the value to microseconds based on the unit.
+    // long long is used to prevent overflows with large values (hours).
+    long long wait_micros = 0;
+    if (unit_char1 == 'm' && unit_char2 == 's') { // Milliseconds
+        wait_micros = value * 1000;
+    } else if (unit_char1 == 'm') { // Minutes
+        wait_micros = value * 60 * 1000000;
+    } else if (unit_char1 == 'h') { // Hours
+        wait_micros = value * 3600 * 1000000;
+    } else { // Seconds (default)
+        wait_micros = value * 1000000;
+    }
+    
+    if (is_silent || wait_micros < 1000000) {
+        // In silent mode or for waits less than one second, sleep for the entire duration at once.
+        usleep(wait_micros);
+    } else {
+        // For longer waits, display a progress indicator.
+        long long seconds_to_wait = wait_micros / 1000000;
+        for (long long i = 0; i < seconds_to_wait; i++) {
+            usleep(1000000); // Wait one second
+            write(STDOUT, ".", 1); // Print a dot
+        }
+        // A newline at the end for clean output.
+        write(STDOUT, "\n", 1);
+    }
 
     return 0; // Successful execution
 }

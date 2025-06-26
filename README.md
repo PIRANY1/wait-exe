@@ -1,14 +1,21 @@
 # wait-exe
 
-**Simple Wait Application**
+**A minimal, feature-rich wait/sleep utility for the command line.**
 
-This small C program provides a simple wait/sleep function, designed for use with **DataSpammer** or other scripts.
-Since `cmd.exe` doesn’t support sleeping in **milliseconds**, this tool fills that gap.
+This small C program provides a flexible wait/sleep function, originally created as a `sleep` replacement for Windows `cmd.exe` or for scripting environments that lack precise timing control.
+
+This enhanced version is designed for minimal file size while offering features not found in basic `sleep` commands:
+
+  * Precise timing with units: **milliseconds (`ms`)**, **seconds (`s`)**, **minutes (`m`)**, and **hours (`h`)**.
+  * An optional **silent mode** (`-s`) to suppress all output.
+  * A **progress indicator** (`.`) that is displayed each second during long waits.
 
 ### 🛠️ Compile with GCC:
 
-```cmd
-gcc -Os -s -o wait.exe wait.c \
+These flags are highly recommended to achieve the smallest possible executable size.
+
+```bash
+gcc -o wait.exe wait.c -Os -s \
     -ffunction-sections \
     -fdata-sections \
     -Wl,--gc-sections \
@@ -17,15 +24,67 @@ gcc -Os -s -o wait.exe wait.c \
     -flto
 ```
 
-### ▶️ Usage:
+### ▶️ Usage
 
-```cmd
-wait.exe <value>
+#### Syntax
+
+```
+wait.exe [-s] <value>[unit]
 ```
 
-Each value represents **0.5 seconds** of delay:
+#### Arguments
 
-* `wait.exe 1` → waits **0.5 seconds**
-* `wait.exe 2` → waits **1 second**
-* `wait.exe 3` → waits **1.5 seconds**
-* `wait.exe 4` → waits **2 seconds**
+| Argument | Description | Required |
+| :--- | :--- | :--- |
+| `-s` | Enables **silent mode**. No progress dots will be printed to the console. This flag must come first. | No |
+| `<value>` | A non-negative integer that specifies the duration of the wait. | Yes |
+| `[unit]` | A suffix that specifies the time unit. If omitted, **seconds (`s`)** are used as the default. | No |
+
+**Available units:**
+
+  * `ms` - Milliseconds
+  * `s`  - Seconds (**default**)
+  * `m`  - Minutes
+  * `h`  - Hours
+
+#### Examples
+
+  * **Wait for 5 seconds (default unit):**
+
+    ```cmd
+    wait.exe 5
+    ```
+
+    *(Output: .....)*
+
+  * **Wait for 1.5 seconds (by using milliseconds):**
+
+    ```cmd
+    wait.exe 1500ms
+    ```
+
+    *(Output: .)*
+
+  * **Wait for 1 minute silently (no progress dots):**
+
+    ```cmd
+    wait.exe -s 1m
+    ```
+
+    *(No output)*
+
+  * **Wait for 10 seconds (explicit unit):**
+
+    ```cmd
+    wait.exe 10s
+    ```
+
+    *(Output: ..........)*
+
+  * **Wait for half a second (500ms):**
+
+    ```cmd
+    wait.exe 500ms
+    ```
+
+    *(No output, as the duration is less than one second)*
