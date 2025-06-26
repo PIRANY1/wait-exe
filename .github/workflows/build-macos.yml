@@ -1,0 +1,31 @@
+name: Build macOS
+
+on:
+  workflow_run:
+    workflows: ["Build Linux"]
+    types:
+      - completed
+
+jobs:
+  build-macos:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Compile wait.c
+      run: clang -Os -s -o wait-macos wait.c
+
+    - name: Generate SHA256 checksum
+      run: shasum -a 256 wait-macos > wait-macos.sha256
+
+    - name: Create bin folder
+      run: mkdir -p bin && mv wait-macos wait-macos.sha256 bin/
+
+    - name: Upload to repository
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "🍎 Build wait-macos and generate SHA256"
+        file_pattern: bin/wait-macos bin/wait-macos.sha256

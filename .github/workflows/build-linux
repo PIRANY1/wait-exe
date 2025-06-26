@@ -1,0 +1,31 @@
+name: Build Linux
+
+on:
+  workflow_run:
+    workflows: ["Build Windows"]
+    types:
+      - completed
+
+jobs:
+  build-linux:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Compile wait.c
+      run: |
+        gcc -Os -s -o wait wait.c
+
+    - name: Generate SHA256 checksum
+      run: sha256sum wait > wait.sha256
+
+    - name: Create bin folder
+      run: mkdir -p bin && mv wait wait.sha256 bin/
+
+    - name: Upload to repository
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "🐧 Build wait (Linux) and generate SHA256"
+        file_pattern: bin/wait bin/wait.sha256
