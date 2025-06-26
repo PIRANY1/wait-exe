@@ -2,6 +2,8 @@
 
 **A minimal, feature-rich wait/sleep utility for the command line.**
 
+![Build Status](https://github.com/<your-username>/<your-repo>/actions/workflows/build.yml/badge.svg)
+
 This small C program provides a flexible wait/sleep function, originally created as a `sleep` replacement for Windows `cmd.exe` or for scripting environments that lack precise timing control.
 
 This enhanced version is designed for minimal file size while offering features not found in basic `sleep` commands:
@@ -9,6 +11,19 @@ This enhanced version is designed for minimal file size while offering features 
   * Precise timing with units: **milliseconds (`ms`)**, **seconds (`s`)**, **minutes (`m`)**, and **hours (`h`)**.
   * An optional **silent mode** (`-s`) to suppress all output.
   * A **progress indicator** (`.`) that is displayed each second during long waits.
+
+
+### 📦 Downloads
+
+Precompiled binaries for all major platforms can be found in the [`bin/`](bin/) folder:
+
+| Platform | Binary | SHA256 |
+|----------|--------|--------|
+| 🪟 Windows | [`wait.exe`](bin/wait.exe) | [`wait.exe.sha256`](bin/wait.exe.sha256) |
+| 🐧 Linux   | [`wait`](bin/wait)         | [`wait.sha256`](bin/wait.sha256)         |
+| 🍎 macOS   | [`wait-macos`](bin/wait-macos) | [`wait-macos.sha256`](bin/wait-macos.sha256) |
+
+You can also compile from source using the instructions below.
 
 ### 🛠️ Compile with GCC:
 
