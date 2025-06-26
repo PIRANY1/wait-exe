@@ -1,3 +1,8 @@
+// Use only under License
+// Contribute under https://github.com/PIRANY1/wait-exe
+// Version v1
+// Last edited on 26.06.2025 by PIRANY
+
 #include <unistd.h> // For usleep() and write()
 
 // Define file descriptors for standard output (1) and standard error (2)
