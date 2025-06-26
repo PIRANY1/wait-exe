@@ -2,7 +2,9 @@
 
 **A minimal, feature-rich wait/sleep utility for the command line.**
 
-![Build Status](https://github.com/<your-username>/<your-repo>/actions/workflows/build.yml/badge.svg)
+![Windows Build](https://github.com/PIRANY1/wait-exe/actions/workflows/build-linux.yml/badge.svg)
+![Linux Build](https://github.com/PIRANY1/wait-exe/actions/workflows/build-windows.yml/badge.svg)
+![MacOS Build](https://github.com/PIRANY1/wait-exe/actions/workflows/build-macos.yml/badge.svg)
 
 This small C program provides a flexible wait/sleep function, originally created as a `sleep` replacement for Windows `cmd.exe` or for scripting environments that lack precise timing control.
 
