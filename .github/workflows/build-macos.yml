@@ -30,3 +30,15 @@ jobs:
       with:
         commit_message: "🍎 Build wait-macos and generate SHA256"
         file_pattern: bin/wait-macos bin/wait-macos.sha256
+
+    - name: Upload wait.exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: wait-macos
+        path: bin/wait-macos
+
+    - name: Upload sha256
+      uses: actions/upload-artifact@v4
+      with:
+        name: wait-macos.sha256
+        path: bin/wait-macos.sha256

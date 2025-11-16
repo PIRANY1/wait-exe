@@ -33,3 +33,15 @@ jobs:
       with:
         commit_message: "🔧 Build wait.exe and generate SHA256"
         file_pattern: bin/wait.exe bin/wait.exe.sha256
+
+    - name: Upload wait.exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: wait.exe
+        path: bin/wait.exe
+
+    - name: Upload sha256
+      uses: actions/upload-artifact@v4
+      with:
+        name: wait.exe.sha256
+        path: bin/wait.exe.sha256
